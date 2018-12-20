@@ -1,1 +1,1 @@
-# decentralized-interactive-lan-chat
+# qt-p2p-lan-chat
