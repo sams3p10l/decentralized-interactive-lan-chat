@@ -54,7 +54,7 @@ public:
         messageEdit->setGeometry(QRect(0, 450, 621, 51));
         chatBox = new QTextBrowser(centralWidget);
         chatBox->setObjectName(QString::fromUtf8("chatBox"));
-        chatBox->setGeometry(QRect(-5, 1, 641, 431));
+        chatBox->setGeometry(QRect(0, 0, 641, 431));
         scrollArea = new QScrollArea(centralWidget);
         scrollArea->setObjectName(QString::fromUtf8("scrollArea"));
         scrollArea->setGeometry(QRect(640, -1, 151, 451));

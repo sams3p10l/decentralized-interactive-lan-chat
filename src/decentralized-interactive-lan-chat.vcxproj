@@ -107,20 +107,20 @@
     </ResourceCompile>
     <QtMoc>
       <QTDIR>E:\QT\5.12.0\MSVC2017_64</QTDIR>
-      <InputFile>%(FullPath)</InputFile>
       <OutputFile>.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</OutputFile>
-      <IncludePath>.\GeneratedFiles\$(ConfigurationName);.\GeneratedFiles;E:/QT/5.12.0/MSVC2017_64/mkspecs/win32-msvc;.;E:/QT/5.12.0/MSVC2017_64/include;E:/QT/5.12.0/MSVC2017_64/include/QtWidgets;E:/QT/5.12.0/MSVC2017_64/include/QtGui;E:/QT/5.12.0/MSVC2017_64/include/QtANGLE;E:/QT/5.12.0/MSVC2017_64/include/QtCore</IncludePath>
       <Define>UNICODE;_UNICODE;WIN32;_ENABLE_EXTENDED_ALIGNED_STORAGE;WIN64;QT_DEPRECATED_WARNINGS;QT_NO_DEBUG;QT_WIDGETS_LIB;QT_GUI_LIB;QT_CORE_LIB</Define>
       <CompilerFlavor>msvc</CompilerFlavor>
       <Include>./$(Configuration)/moc_predefs.h</Include>
       <ExecutionDescription>Moc'ing %(Identity)...</ExecutionDescription>
+      <InputFile>%(FullPath)</InputFile>
       <DynamicSource>output</DynamicSource>
+      <IncludePath>.\GeneratedFiles\$(ConfigurationName);.\GeneratedFiles;E:/QT/5.12.0/MSVC2017_64/mkspecs/win32-msvc;.;E:/QT/5.12.0/MSVC2017_64/include;E:/QT/5.12.0/MSVC2017_64/include/QtWidgets;E:/QT/5.12.0/MSVC2017_64/include/QtGui;E:/QT/5.12.0/MSVC2017_64/include/QtANGLE;E:/QT/5.12.0/MSVC2017_64/include/QtCore</IncludePath>
     </QtMoc>
     <QtUic>
-      <QTDIR>E:\QT\5.12.0\MSVC2017_64</QTDIR>
-      <InputFile>%(FullPath)</InputFile>
       <OutputFile>.\GeneratedFiles\ui_%(Filename).h</OutputFile>
+      <QTDIR>E:\QT\5.12.0\MSVC2017_64</QTDIR>
       <ExecutionDescription>Uic'ing %(Identity)...</ExecutionDescription>
+      <InputFile>%(FullPath)</InputFile>
     </QtUic>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -163,30 +163,33 @@
     <ResourceCompile>
       <PreprocessorDefinitions>_WINDOWS;UNICODE;_UNICODE;WIN32;_ENABLE_EXTENDED_ALIGNED_STORAGE;WIN64;QT_DEPRECATED_WARNINGS;QT_WIDGETS_LIB;QT_GUI_LIB;QT_CORE_LIB;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
+    <QtUic>
+      <OutputFile>.\GeneratedFiles\ui_%(Filename).h</OutputFile>
+      <QTDIR>E:\QT\5.12.0\MSVC2017_64</QTDIR>
+      <ExecutionDescription>Uic'ing %(Identity)...</ExecutionDescription>
+      <InputFile>%(FullPath)</InputFile>
+    </QtUic>
     <QtMoc>
       <QTDIR>E:\QT\5.12.0\MSVC2017_64</QTDIR>
-      <InputFile>%(FullPath)</InputFile>
       <OutputFile>.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</OutputFile>
-      <IncludePath>.\GeneratedFiles\$(ConfigurationName);.\GeneratedFiles;E:/QT/5.12.0/MSVC2017_64/mkspecs/win32-msvc;.;E:/QT/5.12.0/MSVC2017_64/include;E:/QT/5.12.0/MSVC2017_64/include/QtWidgets;E:/QT/5.12.0/MSVC2017_64/include/QtGui;E:/QT/5.12.0/MSVC2017_64/include/QtANGLE;E:/QT/5.12.0/MSVC2017_64/include/QtCore</IncludePath>
       <Define>UNICODE;_UNICODE;WIN32;_ENABLE_EXTENDED_ALIGNED_STORAGE;WIN64;QT_DEPRECATED_WARNINGS;QT_WIDGETS_LIB;QT_GUI_LIB;QT_CORE_LIB</Define>
       <CompilerFlavor>msvc</CompilerFlavor>
       <Include>./$(Configuration)/moc_predefs.h</Include>
       <ExecutionDescription>Moc'ing %(Identity)...</ExecutionDescription>
-      <DynamicSource>output</DynamicSource>
-    </QtMoc>
-    <QtUic>
-      <QTDIR>E:\QT\5.12.0\MSVC2017_64</QTDIR>
       <InputFile>%(FullPath)</InputFile>
-      <OutputFile>.\GeneratedFiles\ui_%(Filename).h</OutputFile>
-      <ExecutionDescription>Uic'ing %(Identity)...</ExecutionDescription>
-    </QtUic>
+      <DynamicSource>output</DynamicSource>
+      <IncludePath>.\GeneratedFiles\$(ConfigurationName);.\GeneratedFiles;E:/QT/5.12.0/MSVC2017_64/mkspecs/win32-msvc;.;E:/QT/5.12.0/MSVC2017_64/include;E:/QT/5.12.0/MSVC2017_64/include/QtWidgets;E:/QT/5.12.0/MSVC2017_64/include/QtGui;E:/QT/5.12.0/MSVC2017_64/include/QtANGLE;E:/QT/5.12.0/MSVC2017_64/include/QtCore</IncludePath>
+    </QtMoc>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="mainwindow.cpp" />
+    <ClCompile Include="nicknamedialog.cpp" />
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="mainwindow.h">
+    </QtMoc>
+    <QtMoc Include="nicknamedialog.h">
     </QtMoc>
   </ItemGroup>
   <ItemGroup>
@@ -207,9 +210,12 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </CustomBuild>
     <ClInclude Include="ui_mainwindow.h" />
+    <ClInclude Include="ui_nicknamedialog.h" />
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="mainwindow.ui">
+    </QtUic>
+    <QtUic Include="nicknamedialog.ui">
     </QtUic>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -14,9 +14,19 @@ class NicknameDialog : public QDialog
 public:
     explicit NicknameDialog(QWidget *parent = nullptr);
     ~NicknameDialog();
+    QString getNickname();
+    QStringList activeUserList;
+
+signals:
+    void windowClosed();
+
+private slots:
+    void on_cancelButton_clicked();
+    void on_okButton_clicked();
 
 private:
     Ui::NicknameDialog *ui;
+    QPushButton *cancelButton;
 };
 
 #endif // NICKNAMEDIALOG_H

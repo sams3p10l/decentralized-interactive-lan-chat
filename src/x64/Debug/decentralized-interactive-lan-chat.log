@@ -1,1 +1,5 @@
-﻿  decentralized-interactive-lan-chat.vcxproj -> E:\decentralized-interactive-lan-chat\src\debug\decentralized-interactive-lan-chat.exe
+﻿  Moc'ing nicknamedialog.h...
+  Uic'ing nicknamedialog.ui...
+  nicknamedialog.cpp
+  moc_nicknamedialog.cpp
+  decentralized-interactive-lan-chat.vcxproj -> E:\decentralized-interactive-lan-chat\src\debug\decentralized-interactive-lan-chat.exe
