@@ -6,7 +6,7 @@
 #include <QCborStreamWriter>
 #include <QTimer>
 
-class Connection : public QTcpSocket
+class Connection : public QTcpSocket //zasto QTcp a ne QUdp?
 {
     Q_OBJECT
 

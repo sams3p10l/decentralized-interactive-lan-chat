@@ -13,6 +13,12 @@ Connection::Connection(QObject *parent) : QTcpSocket (parent), writer(this)
     QObject::connect(&pingTimer, SIGNAL(timeout()), this, SLOT(sendPing()));
 }
 
+Connection::Connection(qintptr handle, QObject *parent) : Connection(parent)
+{
+    setSocketDescriptor(handle);
+    reader.setDevice(this);
+}
+
 Connection::~Connection()
 {
 

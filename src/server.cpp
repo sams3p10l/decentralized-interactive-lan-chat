@@ -1,6 +1,6 @@
 #include <QtNetwork>
-#include "connection.h"
 #include "server.h"
+#include "connection.h"
 
 Server::Server(QObject *parent) : QTcpServer(parent)
 {

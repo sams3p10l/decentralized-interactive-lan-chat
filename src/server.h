@@ -1,7 +1,7 @@
 #ifndef SERVER_H
 #define SERVER_H
 
-#include<QTcpServer>
+#include <QTcpServer>
 
 class Connection;
 
@@ -16,7 +16,7 @@ signals:
     void newConnection(Connection *connection);
 
 protected:
-    void incomingConnection(qintptr handle);
+    void incomingConnection(qintptr handle) override;
 };
 
-#endif // SERVER_H
+#endif

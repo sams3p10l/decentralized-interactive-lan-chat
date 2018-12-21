@@ -16,6 +16,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     connect(nickname, SIGNAL(windowClosed()), this, SLOT(refreshUserList()));
     connect(ui->messageEdit, SIGNAL(returnPressed()), this, SLOT(enterPressed()));
+    /* override ono govno da baca returnpressed kad se klikne enter */
 
     localNickname = nickname->getNickname(); //get current user nickname
 

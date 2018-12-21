@@ -30,14 +30,16 @@ SOURCES += \
     nicknamedialog.cpp \
     server.cpp \
     client.cpp \
-    connection.cpp
+    connection.cpp \
+    transmitter.cpp
 
 HEADERS += \
         mainwindow.h \
     nicknamedialog.h \
     server.h \
     client.h \
-    connection.h
+    connection.h \
+    transmitter.h
 
 FORMS += \
         mainwindow.ui \
