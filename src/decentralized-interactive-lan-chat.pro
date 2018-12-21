@@ -27,11 +27,17 @@ CONFIG += c++11
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
-    nicknamedialog.cpp
+    nicknamedialog.cpp \
+    server.cpp \
+    client.cpp \
+    connection.cpp
 
 HEADERS += \
         mainwindow.h \
-    nicknamedialog.h
+    nicknamedialog.h \
+    server.h \
+    client.h \
+    connection.h
 
 FORMS += \
         mainwindow.ui \
