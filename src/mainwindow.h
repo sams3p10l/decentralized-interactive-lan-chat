@@ -17,7 +17,7 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     static void addUserToList(QString nick);
     static QStringList *activeUserList;
-    QString localNickname;
+    static QString getMyNickname();
 
     ~MainWindow();
 
@@ -34,6 +34,7 @@ private slots:
 private:
     Ui::MainWindow *ui;
     NicknameDialog *nickname;
+    static QString localNickname;
 };
 
 #endif // MAINWINDOW_H

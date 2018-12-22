@@ -105,3 +105,8 @@ void MainWindow::participantLeft(const QString &nick)
     ui->chatBox->append((nick + " has left"));
     ui->chatBox->setTextColor(color);
 }
+
+QString MainWindow::getMyNickname()
+{
+    return localNickname;
+}
