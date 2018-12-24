@@ -2,8 +2,10 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include "client.h"
 #include "nicknamedialog.h"
 #include <QStringList>
+#include "ui_mainwindow.h"
 
 namespace Ui {
 class MainWindow;
@@ -35,6 +37,9 @@ private:
     Ui::MainWindow *ui;
     NicknameDialog *nickname;
     static QString localNickname;
+    Client client;
+
+
 };
 
 #endif // MAINWINDOW_H

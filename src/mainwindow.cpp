@@ -1,8 +1,7 @@
 #include "mainwindow.h"
-#include "ui_mainwindow.h"
-#include "nicknamedialog.h"
 
 QStringList *MainWindow::activeUserList = new QStringList();
+QString MainWindow::localNickname = "";
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {    

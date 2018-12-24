@@ -75,3 +75,8 @@ void Connection::processData()
     type = Undefined;
     readBuffer.clear();
 }
+
+QString Connection::getFullName() const //mozda nepotrebno
+{
+    return fullName;
+}

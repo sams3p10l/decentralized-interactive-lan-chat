@@ -20,6 +20,7 @@ public:
     Connection(qintptr handle, QObject *parent = nullptr);
     ~Connection();
 
+    QString getFullName() const;
     bool sendMessage(const QString &message);
 
 private slots:
@@ -28,6 +29,7 @@ private slots:
 
 signals:
     void newMessage(const QString &from, const QString &message);
+    void connectionReady();
 
 private:
     QCborStreamReader reader;
@@ -37,6 +39,7 @@ private:
     DataTypes type;
     QTimer pingTimer;
     int transferTimerID;
+    QString fullName;
 
 protected:
     void timerEvent(QTimerEvent *event);

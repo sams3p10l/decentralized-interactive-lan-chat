@@ -8,6 +8,7 @@
 #include <QByteArray>
 
 class Client;
+class Connection;
 
 class Transmitter : public QObject
 {
@@ -15,10 +16,16 @@ class Transmitter : public QObject
 
 public:
     Transmitter(Client *client);
+    bool isLocalHost(const QHostAddress &address);
+    void startBroadcast();
+    void setListenPort(int port);
+
+signals:
+    void newConnection(Connection *connection);
 
 private:
     Client *client;
-    qint16 serverPort;
+    int listenPort;
     QUdpSocket broadcastSocket;
     QTimer broadcastTimer;
     QString nickname;

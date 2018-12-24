@@ -11,7 +11,9 @@ static const int broadcastPort = 45454;
 Transmitter::Transmitter(Client *client) : QObject (client)
 {
     this->client = client;
-    serverPort = 0;
+
+    getAllAddresses();
+    listenPort = 0;
 
     broadcastSocket.bind(QHostAddress::Any, broadcastPort, QUdpSocket::ShareAddress |
                           QUdpSocket::ReuseAddressHint);
@@ -43,7 +45,7 @@ void Transmitter::sendDatagram()
     QCborStreamWriter writer(&datagram);
     writer.startArray(2);
     writer.append(MainWindow::getMyNickname());
-    writer.append(serverPort);
+    writer.append(listenPort);
     writer.endArray();
 
     bool updateAddressesFlag = false;
@@ -75,6 +77,26 @@ void Transmitter::getAllAddresses()
             }
         }
     }
+}
+
+bool Transmitter::isLocalHost(const QHostAddress &address)
+{
+    for(QHostAddress local : ipAddrList)
+    {
+        if(address.isEqual(local))
+            return true;
+    }
+    return false;
+}
+
+void Transmitter::startBroadcast()
+{
+    broadcastTimer.start();
+}
+
+void Transmitter::setListenPort(int port)
+{
+    listenPort = port;
 }
 
 
