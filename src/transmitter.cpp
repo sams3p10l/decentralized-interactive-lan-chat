@@ -28,13 +28,34 @@ void Transmitter::readDatagram()
     while(broadcastSocket.hasPendingDatagrams())
     {
         QHostAddress senderIP;
-        quint16 senderPort;
+        quint16 senderClientPort;
         QByteArray datagram;
+        //QString result;
 
         datagram.resize(broadcastSocket.pendingDatagramSize());
-        broadcastSocket.readDatagram(datagram.data(), datagram.size(), &senderIP, &senderPort);
+        broadcastSocket.readDatagram(datagram.data(), datagram.size(), &senderIP, &senderClientPort);
 
-        //TODO
+        int senderServerPort;
+        QCborStreamReader reader(datagram);
+
+        reader.enterContainer();
+
+        while (reader.readString().status == QCborStreamReader::Ok)
+        {
+          //???
+        }
+
+        senderServerPort = reader.toInteger();
+
+        if(isLocalHost(senderIP) && senderServerPort == listenPort)
+            continue;
+
+        if(!client->clientHasConnectionCheck(senderIP, senderClientPort))
+        {
+            Connection *connection = new Connection(this);
+            emit newConnection(connection);
+            connection->connectToHost(senderIP, senderServerPort);
+        }
     }
 }
 
@@ -97,6 +118,11 @@ void Transmitter::startBroadcast()
 void Transmitter::setListenPort(int port)
 {
     listenPort = port;
+}
+
+QString Transmitter::getUsername() const
+{
+    return nickname;
 }
 
 

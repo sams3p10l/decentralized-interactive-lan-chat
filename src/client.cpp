@@ -1,3 +1,5 @@
+#include <QtNetwork>
+
 #include "client.h"
 #include "transmitter.h"
 #include "connection.h"
@@ -20,7 +22,10 @@ void Client::sendMessage(const QString &message)
     if(message.isEmpty())
         return;
 
+    QList<Connection *> connections = peers.values();
 
+    for(Connection *connection : connections)
+        connection->sendMessage(message);
 }
 
 void Client::newConnection(Connection *connection) //deduce connection state
@@ -42,7 +47,7 @@ void Client::connectionReady()
 
     peers.insert(connection->peerAddress(), connection);
 
-    QString nick = connection->getFullName();
+    QString nick = connection->getIncomingConnectionUsername();
     if (!nick.isEmpty())
         emit newParticipant(nick);
 }
@@ -66,7 +71,6 @@ bool Client::clientHasConnectionCheck(const QHostAddress &senderIP, int senderPo
 void Client::disconnected()
 {
     Connection *connection = qobject_cast<Connection *>(sender());
-
     removeConnection(connection);
 }
 
@@ -75,10 +79,16 @@ void Client::removeConnection(Connection *connection)
     if (peers.contains(connection->peerAddress()))
     {
         peers.remove(connection->peerAddress());
-        QString nick = connection->getFullName();
+        QString nick = connection->getIncomingConnectionUsername();
         if (!nick.isEmpty())
             emit participantLeft(nick);
     }
 
     connection->deleteLater();
+}
+
+QString Client::fullLocalNickname() const
+{
+    return transmitter->getUsername() + '@' + QHostInfo::localHostName()
+            + ':' + QString::number(server.serverPort());
 }

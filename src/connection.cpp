@@ -1,16 +1,13 @@
 #include "connection.h"
 #include <QtNetwork>
 
-static const int PingInterval = 5 * 1000;
-static const int PongTimeout = 60 * 1000;
-
 Connection::Connection(QObject *parent) : QTcpSocket (parent), writer(this)
 {
-    nick = "unknown";
+    incomingConnectionUsername = "unknown";
     transferTimerID = -1;
-    pingTimer.setInterval(PingInterval);
 
-    QObject::connect(&pingTimer, SIGNAL(timeout()), this, SLOT(sendPing()));
+    QObject::connect(this, SIGNAL(readyRead()), this, SLOT(processReadyRead()));
+    QObject::connect(this, SIGNAL(connected()), this, SLOT(sendGreeting()));
 }
 
 Connection::Connection(qintptr handle, QObject *parent) : Connection(parent)
@@ -21,15 +18,7 @@ Connection::Connection(qintptr handle, QObject *parent) : Connection(parent)
 
 Connection::~Connection()
 {
-
-}
-
-void Connection::sendPing()
-{
-    writer.startMap(1);
-    writer.append(Ping);
-    writer.append(nullptr);
-    writer.endMap();
+    writer.endArray();
 }
 
 bool Connection::sendMessage(const QString &message)
@@ -55,28 +44,55 @@ void Connection::timerEvent(QTimerEvent *timerEvent)
 
 void Connection::processData()
 {
-    switch(type)
+    if(type == Message)
+        emit newMessage(incomingConnectionUsername, readBuffer);
+    else
     {
-        case Message:
-            emit newMessage(nick, readBuffer);
-            break;
-        case Ping:
-            writer.startMap(1);
-            writer.append(Ping);
-            writer.append(nullptr);
-            writer.endMap();
-            break;
-        case Pong:
-            //
-        default:
-            break;
+        return; //
     }
 
     type = Undefined;
     readBuffer.clear();
 }
 
-QString Connection::getFullName() const //mozda nepotrebno
+QString Connection::getIncomingConnectionUsername() const //mozda nepotrebno
 {
-    return fullName;
+    return incomingConnectionUsername;
+}
+
+void Connection::processReadyRead()
+{
+    reader.reparse();
+
+
+}
+
+void Connection::sendGreeting()
+{
+    writer.startArray();
+
+    writer.startMap(1);
+    writer.append(Greeting);
+    writer.append(greetingMsg);
+    writer.endMap();
+
+    isGreetingSent = true;
+
+    if(!reader.device())
+        reader.setDevice(this);
+}
+
+void Connection::processGreeting()
+{
+    incomingConnectionUsername = readBuffer + '@' + peerAddress().toString()
+            + ':' + QString::number(peerPort());
+
+    type = Undefined;
+    readBuffer.clear();
+
+    if(!isGreetingSent)
+        sendGreeting();
+
+    state = ConnectionReady;
+    emit connectionReady();
 }

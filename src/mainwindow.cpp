@@ -12,14 +12,22 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     ui->setupUi(this);
     ui->messageEdit->setFocusPolicy(Qt::StrongFocus);
+    ui->chatBox->setFocusPolicy(Qt::NoFocus);
+    ui->chatBox->setReadOnly(true);
+    ui->userList->setFocusPolicy(Qt::NoFocus);
+    ui->messageEdit->installEventFilter(this);
 
     connect(nickname, SIGNAL(windowClosed()), this, SLOT(refreshUserList()));
-    connect(ui->messageEdit, SIGNAL(returnPressed()), this, SLOT(enterPressed()));
-    /* override ono govno da baca returnpressed kad se klikne enter */
+    connect(&client, SIGNAL(newMessage(QString, QString)), this,
+            SLOT(appendMessage(QString, QString)));
+    connect(&client, SIGNAL(newParticipant(QString)), this,
+            SLOT(newParticipant(QString)));
+    connect(&client, SIGNAL(participantLeft(QString)), this,
+            SLOT(participantLeft(QString)));
+
 
     localNickname = nickname->getNickname(); //get current user nickname
 
-    //appendMessage("Pera", "kurcina");
 }
 
 MainWindow::~MainWindow()
@@ -29,9 +37,13 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_sendButton_clicked()
 {
-    QString text = ui->messageEdit->toPlainText();
-    ui->userList->append("test"); //replace
-    ui->chatBox->append(text); //replace
+    QString input = ui->messageEdit->toPlainText();
+
+    if (input.isEmpty())
+        return;
+
+    client.sendMessage(input);
+    appendMessage(localNickname, input);
     ui->messageEdit->clear();
 }
 
@@ -42,6 +54,8 @@ void MainWindow::addUserToList(QString nick)
 
 void MainWindow::refreshUserList()
 {
+    ui->userList->clear();
+
     for (QString user : *activeUserList)
     {
         ui->userList->append(user);
@@ -67,6 +81,7 @@ void MainWindow::enterPressed()
     if (input.isEmpty())
         return;
 
+    client.sendMessage(input);
     appendMessage(localNickname, input);
     ui->messageEdit->clear();
 }
@@ -108,4 +123,23 @@ void MainWindow::participantLeft(const QString &nick)
 QString MainWindow::getMyNickname()
 {
     return localNickname;
+}
+
+bool MainWindow::eventFilter(QObject *watched, QEvent *event)
+{
+    if(watched == ui->messageEdit && event->type() == QEvent::KeyPress)
+    {
+        QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+        if(keyEvent->key() == Qt::Key_Return || keyEvent->key() == Qt::Key_Enter)
+        {
+            enterPressed();
+            return true;
+        }
+        else {
+            return QMainWindow::eventFilter(watched, event);
+        }
+    }
+    else {
+        return QMainWindow::eventFilter(watched, event);
+    }
 }

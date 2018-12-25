@@ -19,6 +19,7 @@ public:
     bool isLocalHost(const QHostAddress &address);
     void startBroadcast();
     void setListenPort(int port);
+    QString getUsername() const;
 
 signals:
     void newConnection(Connection *connection);

@@ -13,19 +13,24 @@ class Connection : public QTcpSocket //zasto QTcp a ne QUdp?
 public:
     enum DataTypes
     {
-        Message, Greeting, Ping, Pong, Undefined
+        Message, Greeting, Undefined
+    };
+
+    enum ConnectionStates
+    {
+        WaitingGreeting, ParsingGreeting, ConnectionReady
     };
 
     Connection(QObject *parent = nullptr);
     Connection(qintptr handle, QObject *parent = nullptr);
     ~Connection();
 
-    QString getFullName() const;
+    QString getIncomingConnectionUsername() const;
     bool sendMessage(const QString &message);
 
 private slots:
-    void sendPing();
-    void processData();
+    void processReadyRead();
+    void sendGreeting();
 
 signals:
     void newMessage(const QString &from, const QString &message);
@@ -35,11 +40,16 @@ private:
     QCborStreamReader reader;
     QCborStreamWriter writer;
     QString readBuffer;
-    QString nick;
     DataTypes type;
+    ConnectionStates state;
     QTimer pingTimer;
     int transferTimerID;
-    QString fullName;
+    QString incomingConnectionUsername;
+    QString greetingMsg;
+    bool isGreetingSent;
+
+    void processData();
+    void processGreeting();
 
 protected:
     void timerEvent(QTimerEvent *event);

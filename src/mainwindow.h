@@ -39,7 +39,9 @@ private:
     static QString localNickname;
     Client client;
 
-
+    // QObject interface
+public:
+    bool eventFilter(QObject *watched, QEvent *event);
 };
 
 #endif // MAINWINDOW_H

@@ -4,6 +4,7 @@
 #include "server.h"
 #include <QHash>
 #include <QHostAddress>
+#include <QHostInfo>
 
 class Transmitter;
 
@@ -15,6 +16,7 @@ public:
     Client();
 
     void sendMessage(const QString &message);
+    QString fullLocalNickname() const;
     bool clientHasConnectionCheck(const QHostAddress &senderIP, int senderPort) const;
 
 signals:
