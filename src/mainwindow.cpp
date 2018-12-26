@@ -10,6 +10,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     nickname->setModal(true);
     nickname->show(); //nickname dialog
 
+    //localNickname = nickname->getNickname(); //get current user nickname
+
     ui->setupUi(this);
     ui->messageEdit->setFocusPolicy(Qt::StrongFocus);
     ui->chatBox->setFocusPolicy(Qt::NoFocus);
@@ -17,16 +19,16 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->userList->setFocusPolicy(Qt::NoFocus);
     ui->messageEdit->installEventFilter(this);
 
+    connect(nickname, SIGNAL(startListening()), &client, SLOT(startListening()));
     connect(nickname, SIGNAL(windowClosed()), this, SLOT(refreshUserList()));
+    connect(nickname, SIGNAL(startBroadcasting()), &client,
+            SLOT(transmitterStartBroadcast()));
     connect(&client, SIGNAL(newMessage(QString, QString)), this,
             SLOT(appendMessage(QString, QString)));
     connect(&client, SIGNAL(newParticipant(QString)), this,
             SLOT(newParticipant(QString)));
     connect(&client, SIGNAL(participantLeft(QString)), this,
             SLOT(participantLeft(QString)));
-
-
-    localNickname = nickname->getNickname(); //get current user nickname
 
 }
 
@@ -58,7 +60,7 @@ void MainWindow::refreshUserList()
 
     for (QString user : *activeUserList)
     {
-        ui->userList->append(user);
+        ui->userList->append(user + '\n');
     }
 }
 
@@ -118,6 +120,11 @@ void MainWindow::participantLeft(const QString &nick)
     ui->chatBox->setTextColor(Qt::gray);
     ui->chatBox->append((nick + " has left"));
     ui->chatBox->setTextColor(color);
+}
+
+void MainWindow::setMyNickname(const QString &myNick)
+{
+    localNickname = myNick;
 }
 
 QString MainWindow::getMyNickname()

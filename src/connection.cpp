@@ -6,6 +6,10 @@ static const int TransferTimeout = 30 * 1000;
 Connection::Connection(QObject *parent) : QTcpSocket (parent), writer(this)
 {
     incomingConnectionUsername = "unknown";
+    greetingMsg = "undefined";
+    state = WaitingGreeting;
+    type = Undefined;
+    isGreetingSent = false;
     transferTimerID = -1;
 
     QObject::connect(this, SIGNAL(readyRead()), this, SLOT(processReadyRead()));
@@ -20,8 +24,11 @@ Connection::Connection(qintptr handle, QObject *parent) : Connection(parent)
 
 Connection::~Connection()
 {
-    writer.endArray();
-    waitForBytesWritten(3000);
+    if(isGreetingSent)
+    {
+        writer.endArray();
+        waitForBytesWritten(3000);
+    }
 }
 
 void Connection::timerEvent(QTimerEvent *timerEvent)
@@ -163,4 +170,9 @@ void Connection::processGreeting()
 
     state = ConnectionReady;
     emit connectionReady();
+}
+
+void Connection::setGreetingMsg(const QString &grMsg)
+{
+    greetingMsg = grMsg;
 }

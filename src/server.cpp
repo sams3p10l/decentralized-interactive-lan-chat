@@ -4,11 +4,16 @@
 
 Server::Server(QObject *parent) : QTcpServer(parent)
 {
-    listen(QHostAddress::Any);
+    connect(parent, SIGNAL(startListening()), this, SLOT(startListening()));
 }
 
 void Server::incomingConnection(qintptr handle)
 {
     Connection *connection = new Connection(handle, this);
     emit newConnection(connection);
+}
+
+void Server::startListening()
+{
+    this->listen(QHostAddress::Any);
 }

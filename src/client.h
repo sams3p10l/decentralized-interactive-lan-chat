@@ -23,11 +23,14 @@ signals:
     void newMessage(const QString &from, const QString &message);
     void newParticipant(const QString &nick);
     void participantLeft(const QString &nick);
+    void startListening();
 
 private slots:
     void newConnection(Connection *connection);
     void connectionReady();
     void disconnected();
+    void transmitterStartBroadcast();
+    void startListeningSlot();
 
 private:
     Transmitter *transmitter;

@@ -19,6 +19,8 @@ public:
 
 signals:
     void windowClosed();
+    void startBroadcasting();
+    void startListening();
 
 private slots:
     void on_cancelButton_clicked();
@@ -27,6 +29,10 @@ private slots:
 private:
     Ui::NicknameDialog *ui;
     QPushButton *cancelButton;
+
+    // QWidget interface
+protected:
+    void closeEvent(QCloseEvent *event);
 };
 
 #endif // NICKNAMEDIALOG_H

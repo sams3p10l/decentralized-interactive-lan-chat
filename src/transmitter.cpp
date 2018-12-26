@@ -12,6 +12,20 @@ Transmitter::Transmitter(Client *client) : QObject (client)
 {
     this->client = client;
 
+    /*static const char *envVariables[] = {
+            "USERNAME", "USER", "USERDOMAIN", "HOSTNAME", "DOMAINNAME"
+        };
+
+    for (const char *varname : envVariables) {
+            nickname = qEnvironmentVariable(varname);
+            if (!nickname.isNull())
+                break;
+        }*/
+
+    nickname = MainWindow::getMyNickname();
+    if (nickname.isEmpty())
+        nickname = "unknown";
+
     getAllAddresses();
     listenPort = 0;
 
@@ -33,7 +47,9 @@ void Transmitter::readDatagram()
         //QString result;
 
         datagram.resize(broadcastSocket.pendingDatagramSize());
-        broadcastSocket.readDatagram(datagram.data(), datagram.size(), &senderIP, &senderClientPort);
+        if (broadcastSocket.readDatagram(datagram.data(), datagram.size(),
+                                         &senderIP, &senderClientPort) == -1)
+               continue;
 
         int senderServerPort;
         QCborStreamReader reader(datagram);
@@ -65,7 +81,7 @@ void Transmitter::sendDatagram()
 
     QCborStreamWriter writer(&datagram);
     writer.startArray(2);
-    writer.append(MainWindow::getMyNickname());
+    writer.append(nickname);
     writer.append(listenPort);
     writer.endArray();
 

@@ -17,9 +17,9 @@ class Transmitter : public QObject
 public:
     Transmitter(Client *client);
     bool isLocalHost(const QHostAddress &address);
-    void startBroadcast();
     void setListenPort(int port);
     QString getUsername() const;
+    void startBroadcast();
 
 signals:
     void newConnection(Connection *connection);

@@ -25,6 +25,7 @@ public:
 
 public slots:
     void appendMessage(const QString &from, const QString &message);
+    static void setMyNickname(const QString &myNick);
 
 private slots:
     void on_sendButton_clicked();

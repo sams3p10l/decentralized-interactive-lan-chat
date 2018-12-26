@@ -27,6 +27,7 @@ public:
 
     QString getIncomingConnectionUsername() const;
     bool sendMessage(const QString &message);
+    void setGreetingMsg(const QString &grMsg);
 
 private slots:
     void processReadyRead();

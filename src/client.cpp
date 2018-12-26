@@ -9,12 +9,23 @@ Client::Client()
     transmitter = new Transmitter(this);
 
     transmitter->setListenPort(server.serverPort());
-    transmitter->startBroadcast();
 
     QObject::connect(transmitter, SIGNAL(newConnection(Connection*)), this,
                      SLOT(newConnection(Connection*)));
     QObject::connect(&server, SIGNAL(newConnection(Connection*)), this,
                      SLOT(newConnection(Connection*)));
+    QObject::connect(this, SIGNAL(startListening()), &server, SLOT(startListening()));
+
+}
+
+void Client::transmitterStartBroadcast()
+{
+    transmitter->startBroadcast();
+}
+
+void Client::startListeningSlot()
+{
+    emit startListening();
 }
 
 void Client::sendMessage(const QString &message)
@@ -30,7 +41,7 @@ void Client::sendMessage(const QString &message)
 
 void Client::newConnection(Connection *connection) //deduce connection state
 {
-    //todo set greeting message?
+    connection->setGreetingMsg(transmitter->getUsername());
 
     connect(connection, SIGNAL(connectionReady()), this, SLOT(connectionReady()));
     connect(connection, SIGNAL(disconnected()), this, SLOT(disconnected()));

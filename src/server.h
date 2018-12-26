@@ -15,6 +15,9 @@ public:
 signals:
     void newConnection(Connection *connection);
 
+private slots:
+    void startListening();
+
 protected:
     void incomingConnection(qintptr handle) override;
 };
