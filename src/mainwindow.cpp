@@ -4,6 +4,7 @@ QStringList *MainWindow::ActiveUserList = new QStringList();
 QString MainWindow::LocalNickname = "";
 Client *MainWindow::client;
 NicknameDialog *MainWindow::nickname;
+QString MainWindow::LastMessage = "";
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {    
@@ -71,6 +72,11 @@ void MainWindow::AppendMessage(const QString &from, const QString &message)
 {
     if(from.isEmpty() || message.isEmpty())
         return;
+
+    if(message == LastMessage)
+        return;
+
+    LastMessage = message;
 
     QString fullMsgFormat = '<' + from + '>' + ' ' + message + '\n';
     ui->chatBox->append(fullMsgFormat);

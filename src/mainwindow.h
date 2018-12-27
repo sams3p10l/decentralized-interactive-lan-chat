@@ -40,6 +40,7 @@ private:
     static NicknameDialog *nickname;
     static QString LocalNickname;
     static Client *client;
+    static QString LastMessage;
 
     // QObject interface
 public:
