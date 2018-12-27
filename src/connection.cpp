@@ -3,176 +3,167 @@
 
 static const int TransferTimeout = 30 * 1000;
 
-Connection::Connection(QObject *parent) : QTcpSocket (parent), writer(this) //for normal connection
+Connection::Connection(QObject *parent) : QTcpSocket (parent), Writer(this) //for normal connection
 {
-    incomingConnectionUsername = "unknown";
-    greetingMsg = "undefined";
-    state = WaitingGreeting;
-    type = Undefined;
-    isGreetingSent = false;
-    transferTimerID = -1;
+    IncomingConnectionUsername = "unknown";
+    GreetingMsg = "undefined";
+    State = WaitingGreeting;
+    Type = Undefined;
+    IsGreetingSent = false;
+    TransferTimerID = -1;
 
-    QObject::connect(this, SIGNAL(connected()), this, SLOT(sendGreeting())); //for greeting
-    QObject::connect(this, SIGNAL(readyRead()), this, SLOT(processReadyRead())); //after greeting signals, for reading content
+    QObject::connect(this, SIGNAL(connected()), this, SLOT(SendGreeting())); //for greeting
+    QObject::connect(this, SIGNAL(readyRead()), this, SLOT(ProcessReadyRead())); //after greeting signals, for reading content
 }
 
 Connection::Connection(qintptr handle, QObject *parent) : Connection(parent) //for connection setup
 {
     setSocketDescriptor(handle);
-    reader.setDevice(this);
+    Reader.setDevice(this);
 }
 
 Connection::~Connection()
 {
-    if(isGreetingSent)
+    if(IsGreetingSent)
     {
-        writer.endArray();
+        Writer.endArray();
         waitForBytesWritten(2000);
     }
 }
 
-void Connection::timerEvent(QTimerEvent *timerEvent)
+void Connection::ProcessData()
 {
-    if (timerEvent->timerId() == transferTimerID) {
-        abort();
-        killTimer(transferTimerID);
-        transferTimerID = -1;
-    }
-}
-
-void Connection::processData()
-{
-    if(type == Message)
-        emit newMessage(incomingConnectionUsername, readBuffer);
+    if(Type == Message)
+        emit NewMessage(IncomingConnectionUsername, ReadBuffer);
     else
     {
         return; //
     }
 
-    type = Undefined;
-    readBuffer.clear();
+    Type = Undefined;
+    ReadBuffer.clear();
 }
 
-QString Connection::getIncomingConnectionUsername() const
+QString Connection::GetIncomingConnectionUsername() const
 {
-    return incomingConnectionUsername;
+    return IncomingConnectionUsername;
 }
 
-void Connection::processReadyRead()
+void Connection::ProcessReadyRead()
 {
-    reader.reparse();
+    Reader.reparse();
 
-    while(reader.lastError() == QCborError::NoError)
+    while(Reader.lastError() == QCborError::NoError)
     {
-        if(state == WaitingGreeting)
+        if(State == WaitingGreeting)
         {
-            if(!reader.isArray())
+            if(!Reader.isArray())
                 break;
 
-            reader.enterContainer();
-            state = ParsingGreeting;
+            Reader.enterContainer();
+            State = ParsingGreeting;
         }
-        else if (reader.containerDepth() == 1) //message and greeting both have depth 1
+        else if (Reader.containerDepth() == 1) //message and greeting both have depth 1
         {
-            if (!reader.hasNext()) //if it's the end of the transmission
+            if (!Reader.hasNext()) //if it's the end of the transmission
             {
-                reader.leaveContainer();
+                Reader.leaveContainer();
                 disconnectFromHost();
                 return;
             }
 
-            reader.enterContainer();
+            Reader.enterContainer();
         }
-        else if (type == Undefined) //deducing data type which comes next
+        else if (Type == Undefined) //deducing data type which comes next
         {
-            if(!reader.isInteger())
+            if(!Reader.isInteger())
                 break;
 
-            type = DataTypes(reader.toInteger());
-            reader.next();
+            Type = DataTypes(Reader.toInteger());
+            Reader.next();
         }
         else //read datagram content
         {
-            if(reader.isString())
+            if(Reader.isString())
             {
-                auto r = reader.readString();
-                readBuffer += r.data;
+                auto r = Reader.readString();
+                ReadBuffer += r.data;
                 if(r.status != QCborStreamReader::EndOfString)
                     continue;
             }
-            else if (reader.isNull())
+            else if (Reader.isNull())
             {
-                reader.next();
+                Reader.next();
             }
             else
                 break;
 
-            reader.leaveContainer();
+            Reader.leaveContainer();
 
-            if(transferTimerID != -1)
+            if(TransferTimerID != -1)
             {
-                killTimer(transferTimerID);
-                transferTimerID = -1;
+                killTimer(TransferTimerID);
+                TransferTimerID = -1;
             }
 
-            if (state == ParsingGreeting)
+            if (State == ParsingGreeting)
             {
-                if (type != Greeting)
+                if (Type != Greeting)
                     break;
-                processGreeting();
+                ProcessGreeting();
             }
             else
-                processData();
+                ProcessData();
         }
     }
 
-    if (transferTimerID != -1 && reader.containerDepth() > 1)
-        transferTimerID = startTimer(TransferTimeout);
+    if (TransferTimerID != -1 && Reader.containerDepth() > 1)
+        TransferTimerID = startTimer(TransferTimeout);
 }
 
-void Connection::sendGreeting()
+void Connection::SendGreeting()
 {
-    writer.startArray();
+    Writer.startArray();
 
-    writer.startMap(1);
-    writer.append(Greeting);
-    writer.append(greetingMsg);
-    writer.endMap();
+    Writer.startMap(1);
+    Writer.append(Greeting);
+    Writer.append(GreetingMsg);
+    Writer.endMap();
 
-    isGreetingSent = true;
+    IsGreetingSent = true;
 
-    if(!reader.device())
-        reader.setDevice(this);
+    if(!Reader.device())
+        Reader.setDevice(this);
 }
 
-bool Connection::sendMessage(const QString &message)
+bool Connection::SendMessage(const QString &message)
 {
     if(message.isEmpty())
         return false;
 
-    writer.startMap(1);
-    writer.append(Message);
-    writer.append(message);
-    writer.endMap();
+    Writer.startMap(1);
+    Writer.append(Message);
+    Writer.append(message);
+    Writer.endMap();
     return true;
 }
 
-void Connection::processGreeting()
+void Connection::ProcessGreeting()
 {
-    incomingConnectionUsername = readBuffer + '@' + peerAddress().toString()
+    IncomingConnectionUsername = ReadBuffer + '@' + peerAddress().toString()
             + ':' + QString::number(peerPort());
 
-    type = Undefined;
-    readBuffer.clear();
+    Type = Undefined;
+    ReadBuffer.clear();
 
-    if(!isGreetingSent)
-        sendGreeting();
+    if(!IsGreetingSent)
+        SendGreeting();
 
-    state = ConnectionReady;
+    State = ConnectionReady;
     emit connectionReady();
 }
 
-void Connection::setGreetingMsg(const QString &grMsg)
+void Connection::SetGreetingMsg(const QString &grMsg)
 {
-    greetingMsg = grMsg;
+    GreetingMsg = grMsg;
 }

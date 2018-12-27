@@ -6,7 +6,7 @@
 #include <QCborStreamWriter>
 #include <QTimer>
 
-class Connection : public QTcpSocket //zasto QTcp a ne QUdp?
+class Connection : public QTcpSocket
 {
     Q_OBJECT
 
@@ -25,35 +25,31 @@ public:
     Connection(qintptr handle, QObject *parent = nullptr);
     ~Connection();
 
-    QString getIncomingConnectionUsername() const;
-    bool sendMessage(const QString &message);
-    void setGreetingMsg(const QString &grMsg);
+    QString GetIncomingConnectionUsername() const;
+    bool SendMessage(const QString &message);
+    void SetGreetingMsg(const QString &grMsg);
 
 private slots:
-    void processReadyRead();
-    void sendGreeting();
+    void ProcessReadyRead();
+    void SendGreeting();
 
 signals:
-    void newMessage(const QString &from, const QString &message);
+    void NewMessage(const QString &from, const QString &message);
     void connectionReady();
 
 private:
-    QCborStreamReader reader;
-    QCborStreamWriter writer;
-    QString readBuffer;
-    DataTypes type;
-    ConnectionStates state;
-    QTimer pingTimer;
-    int transferTimerID;
-    QString incomingConnectionUsername;
-    QString greetingMsg;
-    bool isGreetingSent;
+    QCborStreamReader Reader;
+    QCborStreamWriter Writer;
+    QString ReadBuffer;
+    DataTypes Type;
+    ConnectionStates State;
+    int TransferTimerID;
+    QString IncomingConnectionUsername;
+    QString GreetingMsg;
+    bool IsGreetingSent;
 
-    void processData();
-    void processGreeting();
-
-protected:
-    void timerEvent(QTimerEvent *event);
+    void ProcessData();
+    void ProcessGreeting();
 };
 
 #endif // CONNECTION_H

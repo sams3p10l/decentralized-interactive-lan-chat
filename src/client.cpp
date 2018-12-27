@@ -5,73 +5,63 @@
 #include "connection.h"
 
 Server *Client::server;
-//Transmitter *Client::transmitter;
 
 Client::Client()
 {
-    transmitter = NicknameDialog::getTransmitterInstance();
+    Transmitter = NicknameDialog::GetTransmitterInstance();
     server = new Server();
 
-//    transmitter->setListenPort(server->serverPort());
-
-//    QObject::connect(transmitter, SIGNAL(newConnection(Connection*)), this,
-//                     SLOT(newConnection(Connection*)));
-    QObject::connect(server, SIGNAL(newConnection(Connection*)), this,
-                     SLOT(newConnection(Connection*)));
+    QObject::connect(server, SIGNAL(NewConnection(Connection*)), this,
+                     SLOT(NewConnection(Connection*)));
 
 }
 
-Server* Client::getServerInstance()
+Server* Client::GetServerInstance()
 {
     return server;
 }
 
-//Transmitter* Client::getTransmitterInstance()
-//{
-//    return transmitter;
-//}
-
-void Client::sendMessage(const QString &message)
+void Client::SendMessage(const QString &message)
 {
     if(message.isEmpty())
         return;
 
-    QList<Connection *> connections = peers.values();
+    QList<Connection *> connections = Peers.values();
 
     for(Connection *connection : connections)
-        connection->sendMessage(message);
+        connection->SendMessage(message);
 }
 
-void Client::newConnection(Connection *connection) //deduce connection state
+void Client::NewConnection(Connection *connection) //deduce connection state
 {
-    connection->setGreetingMsg(transmitter->getUsername());
+    connection->SetGreetingMsg(Transmitter->GetUsername());
 
-    connect(connection, SIGNAL(connectionReady()), this, SLOT(connectionReady()));
-    connect(connection, SIGNAL(disconnected()), this, SLOT(disconnected()));
+    connect(connection, SIGNAL(connectionReady()), this, SLOT(ConnectionReady()));
+    connect(connection, SIGNAL(disconnected()), this, SLOT(Disconnected()));
 }
 
-void Client::connectionReady()
+void Client::ConnectionReady()
 {
     Connection *connection = qobject_cast<Connection *>(sender()); //returns a pointer to object that sent a signal
                                                                    //in this case our successful connection
-    if(clientHasConnectionCheck(connection->peerAddress(), connection->peerPort()))
+    if(ClientHasConnectionCheck(connection->peerAddress(), connection->peerPort()))
         return;
 
-    connect(connection, SIGNAL(newMessage(QString, QString)), this, SIGNAL(newMessage(QString, QString)));
+    connect(connection, SIGNAL(NewMessage(QString, QString)), this, SIGNAL(NewMessage(QString, QString)));
 
-    peers.insert(connection->peerAddress(), connection);
+    Peers.insert(connection->peerAddress(), connection);
 
-    QString nick = connection->getIncomingConnectionUsername();
+    QString nick = connection->GetIncomingConnectionUsername();
     if (!nick.isEmpty())
-        emit newParticipant(nick);
+        emit NewParticipant(nick);
 }
 
-bool Client::clientHasConnectionCheck(const QHostAddress &senderIP, int senderPort) const
+bool Client::ClientHasConnectionCheck(const QHostAddress &senderIP, int senderPort) const
 {
-    if(senderPort == -1 || !peers.contains(senderIP))
+    if(senderPort == -1 || !Peers.contains(senderIP))
         return false;
 
-    QList<Connection *> connections = peers.values(senderIP);
+    QList<Connection *> connections = Peers.values(senderIP);
 
     for(Connection *connection : connections)
     {
@@ -82,27 +72,27 @@ bool Client::clientHasConnectionCheck(const QHostAddress &senderIP, int senderPo
     return false;
 }
 
-void Client::disconnected()
+void Client::Disconnected()
 {
     Connection *connection = qobject_cast<Connection *>(sender());
-    removeConnection(connection);
+    RemoveConnection(connection);
 }
 
-void Client::removeConnection(Connection *connection)
+void Client::RemoveConnection(Connection *connection)
 {
-    if (peers.contains(connection->peerAddress()))
+    if (Peers.contains(connection->peerAddress()))
     {
-        peers.remove(connection->peerAddress());
-        QString nick = connection->getIncomingConnectionUsername();
+        Peers.remove(connection->peerAddress());
+        QString nick = connection->GetIncomingConnectionUsername();
         if (!nick.isEmpty())
-            emit participantLeft(nick);
+            emit ParticipantLeft(nick);
     }
 
     connection->deleteLater();
 }
 
-QString Client::fullLocalNickname() const
+QString Client::FullLocalNickname() const
 {
-    return transmitter->getUsername() + '@' + QHostInfo::localHostName()
+    return Transmitter->GetUsername() + '@' + QHostInfo::localHostName()
             + ':' + QString::number(server->serverPort());
 }

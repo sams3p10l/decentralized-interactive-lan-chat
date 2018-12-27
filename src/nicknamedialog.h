@@ -16,12 +16,11 @@ class NicknameDialog : public QDialog
 public:
     explicit NicknameDialog(QWidget *parent = nullptr);
     ~NicknameDialog();
-    QString getNickname();
-    QStringList activeUserList;
-    static Transmitter* getTransmitterInstance();
+    QString GetNickname();
+    static Transmitter* GetTransmitterInstance();
 
 signals:
-    void windowClosed();
+    void WindowClosed();
 
 private slots:
     void on_cancelButton_clicked();

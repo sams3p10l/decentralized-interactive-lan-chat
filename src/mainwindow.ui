@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>789</width>
-    <height>560</height>
+    <width>835</width>
+    <height>557</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -23,6 +23,11 @@
       <height>51</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
    </widget>
    <widget class="QTextBrowser" name="chatBox">
     <property name="geometry">
@@ -33,13 +38,18 @@
       <height>431</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
    </widget>
    <widget class="QScrollArea" name="scrollArea">
     <property name="geometry">
      <rect>
       <x>640</x>
-      <y>-1</y>
-      <width>151</width>
+      <y>0</y>
+      <width>201</width>
       <height>451</height>
      </rect>
     </property>
@@ -51,7 +61,7 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>149</width>
+       <width>199</width>
        <height>449</height>
       </rect>
      </property>
@@ -60,22 +70,14 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>151</width>
+        <width>201</width>
         <height>451</height>
        </rect>
       </property>
-     </widget>
-     <widget class="QScrollBar" name="userScrollBar">
-      <property name="geometry">
-       <rect>
-        <x>130</x>
-        <y>-1</y>
-        <width>20</width>
-        <height>451</height>
-       </rect>
-      </property>
-      <property name="orientation">
-       <enum>Qt::Vertical</enum>
+      <property name="font">
+       <font>
+        <pointsize>9</pointsize>
+       </font>
       </property>
      </widget>
     </widget>
@@ -98,7 +100,7 @@
      <rect>
       <x>619</x>
       <y>450</y>
-      <width>171</width>
+      <width>221</width>
       <height>51</height>
      </rect>
     </property>
@@ -125,7 +127,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>789</width>
+     <width>835</width>
      <height>20</height>
     </rect>
    </property>

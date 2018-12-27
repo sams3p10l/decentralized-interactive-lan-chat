@@ -16,29 +16,29 @@ class Transmitter : public QObject
 
 public:
     Transmitter(Client *client, QString myNick);
-    bool isLocalHost(const QHostAddress &address);
-    void setListenPort(int port);
-    QString getUsername() const;
-    void startBroadcast();
-    static void transSetNickname(const QString &nickname);
+    bool IsLocalHost(const QHostAddress &address);
+    void SetListenPort(int port);
+    QString GetUsername() const;
+    void StartBroadcast();
+    static void TransSetNickname(const QString &Nickname);
 
 signals:
-    void newConnection(Connection *connection);
+    void NewConnection(Connection *connection);
 
 private:
     Client *client;
-    int listenPort;
-    QUdpSocket broadcastSocket;
-    QTimer broadcastTimer;
-    static QString nickname;
-    QList<QHostAddress> broadcastAddrList; //for sending and receiving datagrams
-    QList<QHostAddress> ipAddrList; //for localhost check
+    int ListenPort;
+    QUdpSocket BroadcastSocket;
+    QTimer BroadcastTimer;
+    static QString Nickname;
+    QList<QHostAddress> BroadcastAddrList; //for sending and receiving datagrams
+    QList<QHostAddress> IpAddrList; //for localhost check
 
-    void getAllAddresses();
+    void GetAllAddresses();
 
 private slots:
-    void readDatagram();
-    void sendDatagram();
+    void ReadDatagram();
+    void SendDatagram();
 
 };
 

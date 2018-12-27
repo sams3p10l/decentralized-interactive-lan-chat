@@ -16,29 +16,28 @@ class Client : public QObject
 public:
     Client();
 
-    void sendMessage(const QString &message);
-    QString fullLocalNickname() const;
-    bool clientHasConnectionCheck(const QHostAddress &senderIP, int senderPort) const;
-    static Server* getServerInstance();
-    //static Transmitter* getTransmitterInstance();
+    void SendMessage(const QString &message);
+    QString FullLocalNickname() const;
+    bool ClientHasConnectionCheck(const QHostAddress &senderIP, int senderPort) const;
+    static Server* GetServerInstance();
 
 signals:
-    void newMessage(const QString &from, const QString &message);
-    void newParticipant(const QString &nick);
-    void participantLeft(const QString &nick);
+    void NewMessage(const QString &from, const QString &message);
+    void NewParticipant(const QString &nick);
+    void ParticipantLeft(const QString &nick);
 
 private slots:
-    void newConnection(Connection *connection);
-    void connectionReady();
-    void disconnected();
+    void NewConnection(Connection *connection);
+    void ConnectionReady();
+    void Disconnected();
 
 private:
-    Transmitter *transmitter;
+    Transmitter *Transmitter;
     static Server* server;
-    QMultiHash<QHostAddress, Connection*> peers;
-    QString fullname;
+    QMultiHash<QHostAddress, Connection*> Peers;
+    QString Fullname;
 
-    void removeConnection(Connection *connection);
+    void RemoveConnection(Connection *connection);
 
 };
 

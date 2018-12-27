@@ -14,7 +14,7 @@ NicknameDialog::~NicknameDialog()
     delete ui;
 }
 
-QString NicknameDialog::getNickname()
+QString NicknameDialog::GetNickname()
 {
     return ui->nicknameEdit->text();
 }
@@ -26,28 +26,24 @@ void NicknameDialog::on_cancelButton_clicked()
 
 void NicknameDialog::on_okButton_clicked()
 {
-    MainWindow::addUserToList(getNickname());
-    MainWindow::setMyNickname(getNickname());
-    //Transmitter::transSetNickname(getNickname());
+    MainWindow::AddUserToList(GetNickname());
+    MainWindow::SetMyNickname(GetNickname());
 
-    client = MainWindow::getClientInstance();
-    server = Client::getServerInstance();
+    client = MainWindow::GetClientInstance();
+    server = Client::GetServerInstance();
 
-    //transmitter = Client::getTransmitterInstance();
-    //transmitter->startBroadcast();
+    transmitter = new Transmitter(client, GetNickname());
+    transmitter->StartBroadcast();
+    transmitter->SetListenPort(server->serverPort());
 
-    transmitter = new Transmitter(client, getNickname());
-    transmitter->startBroadcast();
-    transmitter->setListenPort(server->serverPort());
-
-    QObject::connect(transmitter, SIGNAL(newConnection(Connection*)), client,
-                     SLOT(newConnection(Connection*)));
+    QObject::connect(transmitter, SIGNAL(NewConnection(Connection*)), client,
+                     SLOT(NewConnection(Connection*)));
 
     QWidget::close();
-    emit windowClosed();
+    emit WindowClosed();
 }
 
-Transmitter* NicknameDialog::getTransmitterInstance()
+Transmitter* NicknameDialog::GetTransmitterInstance()
 {
     return transmitter;
 }

@@ -14,10 +14,7 @@ public:
     Server(QObject *parent = nullptr);
 
 signals:
-    void newConnection(Connection *connection);
-
-public slots:
-    void startListening();
+    void NewConnection(Connection *connection);
 
 protected:
     void incomingConnection(qintptr handle) override;

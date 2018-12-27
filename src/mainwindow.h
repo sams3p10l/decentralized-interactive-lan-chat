@@ -17,28 +17,28 @@ class MainWindow : public QMainWindow
 
 public:
     explicit MainWindow(QWidget *parent = nullptr);
-    static void addUserToList(QString nick);
-    static QStringList *activeUserList;
-    static QString getMyNickname();
-    static Client* getClientInstance();
+    static void AddUserToList(QString nick);
+    static QStringList *ActiveUserList;
+    static QString GetMyNickname();
+    static Client* GetClientInstance();
 
     ~MainWindow();
 
 public slots:
-    void appendMessage(const QString &from, const QString &message);
-    static void setMyNickname(const QString &myNick);
+    void AppendMessage(const QString &from, const QString &message);
+    static void SetMyNickname(const QString &myNick);
 
 private slots:
     void on_sendButton_clicked();
-    void refreshUserList();
-    void enterPressed();
-    void participantLeft(const QString &nick);
-    void newParticipant(const QString &nick);
+    void RefreshUserList();
+    void EnterPressed();
+    void ParticipantLeft(const QString &nick);
+    void NewParticipant(const QString &nick);
 
 private:
     Ui::MainWindow *ui;
     static NicknameDialog *nickname;
-    static QString localNickname;
+    static QString LocalNickname;
     static Client *client;
 
     // QObject interface

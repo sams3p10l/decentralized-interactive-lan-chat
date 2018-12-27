@@ -5,101 +5,100 @@
 #include "connection.h"
 #include "mainwindow.h"
 
-static const int broadcastInterval = 5000;
-static const unsigned broadcastPort = 45454;
-QString Transmitter::nickname = "";
+static const int BroadcastInterval = 5000;
+static const unsigned BroadcastPort = 45454;
+QString Transmitter::Nickname = "";
 
 Transmitter::Transmitter(Client *client, QString myNick) : QObject (client)
 {
     this->client = client;
-    nickname = myNick;
+    Nickname = myNick;
 
-    if (nickname.isEmpty())
-        nickname = "unknown";
+    if (Nickname.isEmpty())
+        Nickname = "unknown";
 
-    getAllAddresses();
-    listenPort = 0;
+    GetAllAddresses();
+    ListenPort = 0;
 
-    broadcastSocket.bind(QHostAddress::Any, broadcastPort, QUdpSocket::ShareAddress |
+    BroadcastSocket.bind(QHostAddress::Any, BroadcastPort, QUdpSocket::ShareAddress |
                           QUdpSocket::ReuseAddressHint);
 
-    connect(&broadcastSocket, SIGNAL(readyRead()), this, SLOT(readDatagram())); //for establishing connection
-    broadcastTimer.setInterval(broadcastInterval);
-    connect(&broadcastTimer, SIGNAL(timeout()), this, SLOT(sendDatagram())); //for broadcasting writer
+    connect(&BroadcastSocket, SIGNAL(readyRead()), this, SLOT(ReadDatagram())); //for establishing connection
+    BroadcastTimer.setInterval(BroadcastInterval);
+    connect(&BroadcastTimer, SIGNAL(timeout()), this, SLOT(SendDatagram())); //for broadcasting writer
 }
 
-void Transmitter::transSetNickname(const QString &pNickname)
+void Transmitter::TransSetNickname(const QString &pNickname)
 {
-    nickname = pNickname;
+    Nickname = pNickname;
 }
 
-void Transmitter::readDatagram()
+void Transmitter::ReadDatagram()
 {
-    while(broadcastSocket.hasPendingDatagrams())
+    while(BroadcastSocket.hasPendingDatagrams())
     {
-        QHostAddress senderIP;
-        quint16 senderClientPort;
-        QByteArray datagram;
-        //QString result;
+        QHostAddress SenderIP;
+        quint16 SenderClientPort;
+        QByteArray Datagram;
 
-        datagram.resize(broadcastSocket.pendingDatagramSize());
-        if (broadcastSocket.readDatagram(datagram.data(), datagram.size(),
-                                         &senderIP, &senderClientPort) == -1)
+        Datagram.resize(BroadcastSocket.pendingDatagramSize());
+        if (BroadcastSocket.readDatagram(Datagram.data(), Datagram.size(),
+                                         &SenderIP, &SenderClientPort) == -1)
                continue;
 
-        int senderServerPort;
-        QString username;
-        QCborStreamReader reader(datagram);
+        int SenderServerPort;
+        QString Username;
+        QCborStreamReader Reader(Datagram);
 
-        reader.enterContainer();
+        Reader.enterContainer();
 
-        while (reader.readString().status == QCborStreamReader::Ok)
+        while (Reader.readString().status == QCborStreamReader::Ok)
         {
           //reading data into reader
         }
 
-        senderServerPort = reader.toInteger();
+        SenderServerPort = Reader.toInteger();
 
-        if(isLocalHost(senderIP) && senderServerPort == listenPort)
+        if(IsLocalHost(SenderIP) && SenderServerPort == ListenPort)
             continue;
 
-        if(!client->clientHasConnectionCheck(senderIP, senderServerPort))
+        if(!client->ClientHasConnectionCheck(SenderIP, SenderServerPort))
         {
             Connection *connection = new Connection(this);
             qDebug() << "[TRANSMITTER]readDatagram connection invoked " << endl;
-            emit newConnection(connection);
-            connection->connectToHost(senderIP, senderServerPort);
+            emit NewConnection(connection);
+            connection->connectToHost(SenderIP, SenderServerPort);
         }
     }
 }
 
-void Transmitter::sendDatagram()
+void Transmitter::SendDatagram()
 {
-    QByteArray datagram;
-    //qDebug() << "[sendDatagram] invoked" << endl;
+    qDebug() << "transmitter send datagram" << endl;
+    QByteArray Datagram;
 
-    QCborStreamWriter writer(&datagram);
-    writer.startArray(2);
-    writer.append(nickname);
-    writer.append(listenPort);
-    writer.endArray();
+    QCborStreamWriter Writer(&Datagram);
+    Writer.startArray(2);
+    Writer.append(Nickname);
+    Writer.append(ListenPort);
+    Writer.endArray();
 
-    bool updateAddressesFlag = false;
+    bool UpdateAddressesFlag = false;
 
-    for(QHostAddress addr : broadcastAddrList)
+    for(QHostAddress addr : BroadcastAddrList)
     {
-        if (broadcastSocket.writeDatagram(datagram, addr, broadcastPort) == -1)
-            updateAddressesFlag = true; //getAllAddresses() can't be called inside
+        if (BroadcastSocket.writeDatagram(Datagram, addr, BroadcastPort) == -1)
+            UpdateAddressesFlag = true; //getAllAddresses() can't be called inside
     }                                   //cause it would mess up the already valid addresses
 
-    if(updateAddressesFlag)
-        getAllAddresses();
+    if(UpdateAddressesFlag)
+        GetAllAddresses();
 }
 
-void Transmitter::getAllAddresses()
+void Transmitter::GetAllAddresses()
 {
-    broadcastAddrList.clear();
-    ipAddrList.clear();
+    BroadcastAddrList.clear();
+    IpAddrList.clear();
 
     for(QNetworkInterface interface : QNetworkInterface::allInterfaces())
     {
@@ -108,16 +107,16 @@ void Transmitter::getAllAddresses()
             QHostAddress broadcastAddress = addressStruct.broadcast();
             if (broadcastAddress != QHostAddress::Null && addressStruct.ip() != QHostAddress::LocalHost)
             {
-                broadcastAddrList.append(broadcastAddress);
-                ipAddrList.append(addressStruct.ip());
+                BroadcastAddrList.append(broadcastAddress);
+                IpAddrList.append(addressStruct.ip());
             }
         }
     }
 }
 
-bool Transmitter::isLocalHost(const QHostAddress &address)
+bool Transmitter::IsLocalHost(const QHostAddress &address)
 {
-    for(QHostAddress local : ipAddrList)
+    for(QHostAddress local : IpAddrList)
     {
         if(address.isEqual(local))
             return true;
@@ -125,20 +124,20 @@ bool Transmitter::isLocalHost(const QHostAddress &address)
     return false;
 }
 
-void Transmitter::startBroadcast()
+void Transmitter::StartBroadcast()
 {
-    broadcastTimer.start();
+    BroadcastTimer.start();
     qDebug() << "[startBroadcast] invoked" << endl;
 }
 
-void Transmitter::setListenPort(int port)
+void Transmitter::SetListenPort(int port)
 {
-    listenPort = port;
+    ListenPort = port;
 }
 
-QString Transmitter::getUsername() const
+QString Transmitter::GetUsername() const
 {
-    return nickname;
+    return Nickname;
 }
 
 

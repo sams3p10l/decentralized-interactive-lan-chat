@@ -1,7 +1,7 @@
 #include "mainwindow.h"
 
-QStringList *MainWindow::activeUserList = new QStringList();
-QString MainWindow::localNickname = "";
+QStringList *MainWindow::ActiveUserList = new QStringList();
+QString MainWindow::LocalNickname = "";
 Client *MainWindow::client;
 NicknameDialog *MainWindow::nickname;
 
@@ -13,8 +13,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     nickname->setModal(true);
     nickname->show(); //nickname dialog
 
-    //localNickname = nickname->getNickname(); //get current user nickname
-
     ui->setupUi(this);
     ui->messageEdit->setFocusPolicy(Qt::StrongFocus);
     ui->chatBox->setFocusPolicy(Qt::NoFocus);
@@ -22,13 +20,13 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->userList->setFocusPolicy(Qt::NoFocus);
     ui->messageEdit->installEventFilter(this);
 
-    connect(nickname, SIGNAL(windowClosed()), this, SLOT(refreshUserList()));
-    connect(client, SIGNAL(newMessage(QString, QString)), this,
-            SLOT(appendMessage(QString, QString)));
-    connect(client, SIGNAL(newParticipant(QString)), this,
-            SLOT(newParticipant(QString)));
-    connect(client, SIGNAL(participantLeft(QString)), this,
-            SLOT(participantLeft(QString)));
+    connect(nickname, SIGNAL(WindowClosed()), this, SLOT(RefreshUserList()));
+    connect(client, SIGNAL(NewMessage(QString, QString)), this,
+            SLOT(AppendMessage(QString, QString)));
+    connect(client, SIGNAL(NewParticipant(QString)), this,
+            SLOT(NewParticipant(QString)));
+    connect(client, SIGNAL(ParticipantLeft(QString)), this,
+            SLOT(ParticipantLeft(QString)));
 
 }
 
@@ -37,7 +35,7 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-Client* MainWindow::getClientInstance()
+Client* MainWindow::GetClientInstance()
 {
     return client;
 }
@@ -49,27 +47,27 @@ void MainWindow::on_sendButton_clicked()
     if (input.isEmpty())
         return;
 
-    client->sendMessage(input);
-    appendMessage(localNickname, input);
+    client->SendMessage(input);
+    AppendMessage(LocalNickname, input);
     ui->messageEdit->clear();
 }
 
-void MainWindow::addUserToList(QString nick)
+void MainWindow::AddUserToList(QString nick)
 {
-    activeUserList->append(nick);
+    ActiveUserList->append(nick);
 }
 
-void MainWindow::refreshUserList()
+void MainWindow::RefreshUserList()
 {
     ui->userList->clear();
 
-    for (QString user : *activeUserList)
+    for (QString user : *ActiveUserList)
     {
         ui->userList->append(user + '\n');
     }
 }
 
-void MainWindow::appendMessage(const QString &from, const QString &message)
+void MainWindow::AppendMessage(const QString &from, const QString &message)
 {
     if(from.isEmpty() || message.isEmpty())
         return;
@@ -81,19 +79,19 @@ void MainWindow::appendMessage(const QString &from, const QString &message)
     bar->setValue(bar->maximum());
 }
 
-void MainWindow::enterPressed()
+void MainWindow::EnterPressed()
 {
     QString input = ui->messageEdit->toPlainText();
 
     if (input.isEmpty())
         return;
 
-    client->sendMessage(input);
-    appendMessage(localNickname, input);
+    client->SendMessage(input);
+    AppendMessage(LocalNickname, input);
     ui->messageEdit->clear();
 }
 
-void MainWindow::newParticipant(const QString &nick)
+void MainWindow::NewParticipant(const QString &nick)
 {
     if (nick.isEmpty())
         return;
@@ -103,21 +101,21 @@ void MainWindow::newParticipant(const QString &nick)
     ui->chatBox->append((nick + " has joined"));
     ui->chatBox->setTextColor(color);
 
-    activeUserList->append(nick);
-    refreshUserList();
+    ActiveUserList->append(nick);
+    RefreshUserList();
 }
 
-void MainWindow::participantLeft(const QString &nick)
+void MainWindow::ParticipantLeft(const QString &nick)
 {
     if (nick.isEmpty())
         return;
 
-    for(int i = 0; i < activeUserList->length(); i++)
+    for(int i = 0; i < ActiveUserList->length(); i++)
     {
-        if(QString::compare(activeUserList->at(i), nick, Qt::CaseSensitive) == 0)
+        if(QString::compare(ActiveUserList->at(i), nick, Qt::CaseSensitive) == 0)
         {
-            activeUserList->removeAt(i);
-            refreshUserList();
+            ActiveUserList->removeAt(i);
+            RefreshUserList();
         }
     }
 
@@ -127,14 +125,14 @@ void MainWindow::participantLeft(const QString &nick)
     ui->chatBox->setTextColor(color);
 }
 
-void MainWindow::setMyNickname(const QString &myNick)
+void MainWindow::SetMyNickname(const QString &myNick)
 {
-    localNickname = myNick;
+    LocalNickname = myNick;
 }
 
-QString MainWindow::getMyNickname()
+QString MainWindow::GetMyNickname()
 {
-    return localNickname;
+    return LocalNickname;
 }
 
 bool MainWindow::eventFilter(QObject *watched, QEvent *event)
@@ -144,7 +142,7 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event)
         QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
         if(keyEvent->key() == Qt::Key_Return || keyEvent->key() == Qt::Key_Enter)
         {
-            enterPressed();
+            EnterPressed();
             return true;
         }
         else {
