@@ -2,10 +2,11 @@
 #include "ui_nicknamedialog.h"
 #include "mainwindow.h"
 
+Transmitter *NicknameDialog::transmitter;
+
 NicknameDialog::NicknameDialog(QWidget *parent) : QDialog(parent), ui(new Ui::NicknameDialog)
 {
     ui->setupUi(this);
-
 }
 
 NicknameDialog::~NicknameDialog()
@@ -27,13 +28,26 @@ void NicknameDialog::on_okButton_clicked()
 {
     MainWindow::addUserToList(getNickname());
     MainWindow::setMyNickname(getNickname());
+    //Transmitter::transSetNickname(getNickname());
+
+    client = MainWindow::getClientInstance();
+    server = Client::getServerInstance();
+
+    //transmitter = Client::getTransmitterInstance();
+    //transmitter->startBroadcast();
+
+    transmitter = new Transmitter(client, getNickname());
+    transmitter->startBroadcast();
+    transmitter->setListenPort(server->serverPort());
+
+    QObject::connect(transmitter, SIGNAL(newConnection(Connection*)), client,
+                     SLOT(newConnection(Connection*)));
+
     QWidget::close();
     emit windowClosed();
 }
 
-void NicknameDialog::closeEvent(QCloseEvent *event)
+Transmitter* NicknameDialog::getTransmitterInstance()
 {
-    emit startBroadcasting();
-    emit startListening();
-    event->accept();
+    return transmitter;
 }

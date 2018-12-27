@@ -2,6 +2,8 @@
 #define NICKNAMEDIALOG_H
 
 #include <QDialog>
+#include "server.h"
+#include "transmitter.h"
 
 namespace Ui {
 class NicknameDialog;
@@ -16,11 +18,10 @@ public:
     ~NicknameDialog();
     QString getNickname();
     QStringList activeUserList;
+    static Transmitter* getTransmitterInstance();
 
 signals:
     void windowClosed();
-    void startBroadcasting();
-    void startListening();
 
 private slots:
     void on_cancelButton_clicked();
@@ -29,10 +30,10 @@ private slots:
 private:
     Ui::NicknameDialog *ui;
     QPushButton *cancelButton;
+    static Transmitter *transmitter;
+    Client *client;
+    Server *server;
 
-    // QWidget interface
-protected:
-    void closeEvent(QCloseEvent *event);
 };
 
 #endif // NICKNAMEDIALOG_H

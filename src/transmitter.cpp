@@ -5,24 +5,15 @@
 #include "connection.h"
 #include "mainwindow.h"
 
-static const int broadcastInterval = 2000;
-static const int broadcastPort = 45454;
+static const int broadcastInterval = 5000;
+static const unsigned broadcastPort = 45454;
+QString Transmitter::nickname = "";
 
-Transmitter::Transmitter(Client *client) : QObject (client)
+Transmitter::Transmitter(Client *client, QString myNick) : QObject (client)
 {
     this->client = client;
+    nickname = myNick;
 
-    /*static const char *envVariables[] = {
-            "USERNAME", "USER", "USERDOMAIN", "HOSTNAME", "DOMAINNAME"
-        };
-
-    for (const char *varname : envVariables) {
-            nickname = qEnvironmentVariable(varname);
-            if (!nickname.isNull())
-                break;
-        }*/
-
-    nickname = MainWindow::getMyNickname();
     if (nickname.isEmpty())
         nickname = "unknown";
 
@@ -32,9 +23,14 @@ Transmitter::Transmitter(Client *client) : QObject (client)
     broadcastSocket.bind(QHostAddress::Any, broadcastPort, QUdpSocket::ShareAddress |
                           QUdpSocket::ReuseAddressHint);
 
-    connect(&broadcastSocket, SIGNAL(readyRead()), this, SLOT(readDatagram()));
+    connect(&broadcastSocket, SIGNAL(readyRead()), this, SLOT(readDatagram())); //for establishing connection
     broadcastTimer.setInterval(broadcastInterval);
-    connect(&broadcastTimer, SIGNAL(timeout()), this, SLOT(sendDatagram()));
+    connect(&broadcastTimer, SIGNAL(timeout()), this, SLOT(sendDatagram())); //for broadcasting writer
+}
+
+void Transmitter::transSetNickname(const QString &pNickname)
+{
+    nickname = pNickname;
 }
 
 void Transmitter::readDatagram()
@@ -52,13 +48,14 @@ void Transmitter::readDatagram()
                continue;
 
         int senderServerPort;
+        QString username;
         QCborStreamReader reader(datagram);
 
         reader.enterContainer();
 
         while (reader.readString().status == QCborStreamReader::Ok)
         {
-          //???
+          //reading data into reader
         }
 
         senderServerPort = reader.toInteger();
@@ -66,9 +63,10 @@ void Transmitter::readDatagram()
         if(isLocalHost(senderIP) && senderServerPort == listenPort)
             continue;
 
-        if(!client->clientHasConnectionCheck(senderIP, senderClientPort))
+        if(!client->clientHasConnectionCheck(senderIP, senderServerPort))
         {
             Connection *connection = new Connection(this);
+            qDebug() << "[TRANSMITTER]readDatagram connection invoked " << endl;
             emit newConnection(connection);
             connection->connectToHost(senderIP, senderServerPort);
         }
@@ -78,6 +76,7 @@ void Transmitter::readDatagram()
 void Transmitter::sendDatagram()
 {
     QByteArray datagram;
+    //qDebug() << "[sendDatagram] invoked" << endl;
 
     QCborStreamWriter writer(&datagram);
     writer.startArray(2);
@@ -129,6 +128,7 @@ bool Transmitter::isLocalHost(const QHostAddress &address)
 void Transmitter::startBroadcast()
 {
     broadcastTimer.start();
+    qDebug() << "[startBroadcast] invoked" << endl;
 }
 
 void Transmitter::setListenPort(int port)

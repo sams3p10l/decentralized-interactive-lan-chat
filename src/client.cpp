@@ -4,29 +4,32 @@
 #include "transmitter.h"
 #include "connection.h"
 
+Server *Client::server;
+//Transmitter *Client::transmitter;
+
 Client::Client()
 {
-    transmitter = new Transmitter(this);
+    transmitter = NicknameDialog::getTransmitterInstance();
+    server = new Server();
 
-    transmitter->setListenPort(server.serverPort());
+//    transmitter->setListenPort(server->serverPort());
 
-    QObject::connect(transmitter, SIGNAL(newConnection(Connection*)), this,
+//    QObject::connect(transmitter, SIGNAL(newConnection(Connection*)), this,
+//                     SLOT(newConnection(Connection*)));
+    QObject::connect(server, SIGNAL(newConnection(Connection*)), this,
                      SLOT(newConnection(Connection*)));
-    QObject::connect(&server, SIGNAL(newConnection(Connection*)), this,
-                     SLOT(newConnection(Connection*)));
-    QObject::connect(this, SIGNAL(startListening()), &server, SLOT(startListening()));
 
 }
 
-void Client::transmitterStartBroadcast()
+Server* Client::getServerInstance()
 {
-    transmitter->startBroadcast();
+    return server;
 }
 
-void Client::startListeningSlot()
-{
-    emit startListening();
-}
+//Transmitter* Client::getTransmitterInstance()
+//{
+//    return transmitter;
+//}
 
 void Client::sendMessage(const QString &message)
 {
@@ -54,7 +57,7 @@ void Client::connectionReady()
     if(clientHasConnectionCheck(connection->peerAddress(), connection->peerPort()))
         return;
 
-    connect(connection, SIGNAL(newMessage(QString, QString)), this, SIGNAL(newMessage()));
+    connect(connection, SIGNAL(newMessage(QString, QString)), this, SIGNAL(newMessage(QString, QString)));
 
     peers.insert(connection->peerAddress(), connection);
 
@@ -101,5 +104,5 @@ void Client::removeConnection(Connection *connection)
 QString Client::fullLocalNickname() const
 {
     return transmitter->getUsername() + '@' + QHostInfo::localHostName()
-            + ':' + QString::number(server.serverPort());
+            + ':' + QString::number(server->serverPort());
 }

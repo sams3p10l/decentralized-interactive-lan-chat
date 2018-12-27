@@ -2,6 +2,7 @@
 #define CLIENT_H
 
 #include "server.h"
+#include "nicknamedialog.h"
 #include <QHash>
 #include <QHostAddress>
 #include <QHostInfo>
@@ -18,23 +19,22 @@ public:
     void sendMessage(const QString &message);
     QString fullLocalNickname() const;
     bool clientHasConnectionCheck(const QHostAddress &senderIP, int senderPort) const;
+    static Server* getServerInstance();
+    //static Transmitter* getTransmitterInstance();
 
 signals:
     void newMessage(const QString &from, const QString &message);
     void newParticipant(const QString &nick);
     void participantLeft(const QString &nick);
-    void startListening();
 
 private slots:
     void newConnection(Connection *connection);
     void connectionReady();
     void disconnected();
-    void transmitterStartBroadcast();
-    void startListeningSlot();
 
 private:
     Transmitter *transmitter;
-    Server server;
+    static Server* server;
     QMultiHash<QHostAddress, Connection*> peers;
     QString fullname;
 

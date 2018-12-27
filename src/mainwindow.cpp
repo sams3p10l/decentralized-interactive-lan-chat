@@ -2,10 +2,13 @@
 
 QStringList *MainWindow::activeUserList = new QStringList();
 QString MainWindow::localNickname = "";
+Client *MainWindow::client;
+NicknameDialog *MainWindow::nickname;
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {    
     nickname = new NicknameDialog(this);
+    client = new Client();
 
     nickname->setModal(true);
     nickname->show(); //nickname dialog
@@ -19,15 +22,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->userList->setFocusPolicy(Qt::NoFocus);
     ui->messageEdit->installEventFilter(this);
 
-    connect(nickname, SIGNAL(startListening()), &client, SLOT(startListening()));
     connect(nickname, SIGNAL(windowClosed()), this, SLOT(refreshUserList()));
-    connect(nickname, SIGNAL(startBroadcasting()), &client,
-            SLOT(transmitterStartBroadcast()));
-    connect(&client, SIGNAL(newMessage(QString, QString)), this,
+    connect(client, SIGNAL(newMessage(QString, QString)), this,
             SLOT(appendMessage(QString, QString)));
-    connect(&client, SIGNAL(newParticipant(QString)), this,
+    connect(client, SIGNAL(newParticipant(QString)), this,
             SLOT(newParticipant(QString)));
-    connect(&client, SIGNAL(participantLeft(QString)), this,
+    connect(client, SIGNAL(participantLeft(QString)), this,
             SLOT(participantLeft(QString)));
 
 }
@@ -37,6 +37,11 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+Client* MainWindow::getClientInstance()
+{
+    return client;
+}
+
 void MainWindow::on_sendButton_clicked()
 {
     QString input = ui->messageEdit->toPlainText();
@@ -44,7 +49,7 @@ void MainWindow::on_sendButton_clicked()
     if (input.isEmpty())
         return;
 
-    client.sendMessage(input);
+    client->sendMessage(input);
     appendMessage(localNickname, input);
     ui->messageEdit->clear();
 }
@@ -83,7 +88,7 @@ void MainWindow::enterPressed()
     if (input.isEmpty())
         return;
 
-    client.sendMessage(input);
+    client->sendMessage(input);
     appendMessage(localNickname, input);
     ui->messageEdit->clear();
 }

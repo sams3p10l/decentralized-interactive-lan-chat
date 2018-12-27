@@ -2,6 +2,7 @@
 #define SERVER_H
 
 #include <QTcpServer>
+#include <QDebug>
 
 class Connection;
 
@@ -15,7 +16,7 @@ public:
 signals:
     void newConnection(Connection *connection);
 
-private slots:
+public slots:
     void startListening();
 
 protected:

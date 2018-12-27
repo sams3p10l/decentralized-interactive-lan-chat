@@ -20,6 +20,7 @@ public:
     static void addUserToList(QString nick);
     static QStringList *activeUserList;
     static QString getMyNickname();
+    static Client* getClientInstance();
 
     ~MainWindow();
 
@@ -36,9 +37,9 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
-    NicknameDialog *nickname;
+    static NicknameDialog *nickname;
     static QString localNickname;
-    Client client;
+    static Client *client;
 
     // QObject interface
 public:
